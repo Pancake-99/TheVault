@@ -1,0 +1,78 @@
+### Variables globales
+@baseUrl = http://localhost:3000
+# Después de hacer login, copia el token que te devuelve el servidor y pégalo aquí:
+@token = tu_token_jwt_aqui
+# Cuando crees una credencial, copia su id_credential y pégalo aquí para probar los demás endpoints:
+@credentialId = el_uuid_de_tu_credencial_aqui
+
+
+### ==========================================
+### 1. AUTENTICACIÓN
+### ==========================================
+
+### Registrar un nuevo usuario
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "email": "mauricio@ucb.edu.bo",
+    "password": "MiPasswordSeguro123"
+}
+
+###
+
+### Iniciar Sesión (Copia el token de la respuesta a la variable @token arriba)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "mauricio@ucb.edu.bo",
+    "password": "MiPasswordSeguro123"
+}
+
+
+### ==========================================
+### 2. CREDENCIALES (Rutas Protegidas)
+### ==========================================
+
+### Crear una nueva credencial
+# Requisito: POST /credentials
+POST {{baseUrl}}/credentials
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "service_name": "Netflix",
+    "account_username": "mauricio@ucb.edu.bo",
+    "password": "SuperSecretNetflixPassword",
+    "url": "https://netflix.com",
+    "notes": "Cuenta familiar, perfil 2"
+}
+
+###
+
+### Listar todas mis credenciales
+# Requisito: GET /credentials
+GET {{baseUrl}}/credentials
+Authorization: Bearer {{token}}
+
+###
+
+### Obtener el detalle de una credencial específica (sin contraseña)
+# Requisito: GET /credentials/{id}
+GET {{baseUrl}}/credentials/{{credentialId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Acción Explícita: REVELAR CONTRASEÑA
+# Requisito: Endpoint dedicado para ver contraseña y registrar auditoría
+POST {{baseUrl}}/credentials/{{credentialId}}/reveal
+Authorization: Bearer {{token}}
+
+###
+
+### Eliminar una credencial
+# Requisito: DELETE /credentials/{id}
+DELETE {{baseUrl}}/credentials/{{credentialId}}
+Authorization: Bearer {{token}}
