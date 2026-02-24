@@ -1,21 +1,14 @@
 ### Variables globales
 @baseUrl = http://localhost:3000
-# Después de hacer login, copia el token que te devuelve el servidor y pégalo aquí:
-@token = tu_token_jwt_aqui
-# Cuando crees una credencial, copia su id_credential y pégalo aquí para probar los demás endpoints:
-@credentialId = el_uuid_de_tu_credencial_aqui
-
-
-### ==========================================
-### 1. AUTENTICACIÓN
-### ==========================================
+@token = tu_token
+@credentialId = tu_uuid
 
 ### Registrar un nuevo usuario
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-    "email": "mauricio@ucb.edu.bo",
+    "email": "mauricio_test@ucb.edu.bo",
     "password": "MiPasswordSeguro123"
 }
 
@@ -26,14 +19,10 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "mauricio@ucb.edu.bo",
+    "email": "mauricio_test@ucb.edu.bo",
     "password": "MiPasswordSeguro123"
 }
 
-
-### ==========================================
-### 2. CREDENCIALES (Rutas Protegidas)
-### ==========================================
 
 ### Crear una nueva credencial
 # Requisito: POST /credentials
@@ -65,10 +54,26 @@ Authorization: Bearer {{token}}
 
 ###
 
-### Acción Explícita: REVELAR CONTRASEÑA
+### REVELAR CONTRASEÑA
 # Requisito: Endpoint dedicado para ver contraseña y registrar auditoría
-POST {{baseUrl}}/credentials/{{credentialId}}/reveal
+POST {{baseUrl}}/credentials/{{credentialId}}/reveal 
 Authorization: Bearer {{token}}
+
+###
+
+### Actualizar una credencial (con o sin cambio de contraseña)
+# Requisito: PUT/PATCH /credentials/{id} 
+PUT {{baseUrl}}/credentials/{{credentialId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "service_name": "Netflix Familiar",
+    "account_username": "mauricio_test@ucb.edu.bo",
+    "password": "NuevoPasswordNetflix2026",
+    "url": "https://netflix.com",
+    "notes": "Actualicé la contraseña porque me robaron la cuenta"
+}
 
 ###
 

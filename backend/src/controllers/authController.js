@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../DB/db");
-require("dotenv").config();
+const envs = require("../config/envs");
 
 // Registro de usuario
 const register = async (req, res) => {
@@ -64,7 +64,7 @@ const login = async (req, res) => {
     // Generar el token JWT
     const token = jwt.sign(
       { userId: user.id_user, email: user.email }, // Payload (datos que viajan en el token)
-      process.env.JWT_SECRET, // Tu secreto del .env
+      envs.JWT_SECRET, // Tu secreto del .env
       { expiresIn: "2h" }, // Tiempo de expiración
     );
 

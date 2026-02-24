@@ -9,6 +9,7 @@ router.post("/", credentialsController.createCredential);
 router.get("/", credentialsController.getCredentials);
 router.get("/:id", credentialsController.getCredentialById);
 router.delete("/:id", credentialsController.deleteCredential);
+router.put("/:id", credentialsController.updateCredential);
 
 router.post("/:id/reveal", credentialsController.revealPassword);
 

@@ -8,11 +8,9 @@ const createCredential = async (req, res) => {
     const userId = req.user.userId;
 
     if (!service_name || !password) {
-      return res
-        .status(400)
-        .json({
-          error: "El nombre del servicio y la contraseña son obligatorios",
-        });
+      return res.status(400).json({
+        error: "El nombre del servicio y la contraseña son obligatorios",
+      });
     }
 
     const encryptedPassword = encrypt(password);
@@ -139,10 +137,66 @@ const revealPassword = async (req, res) => {
   }
 };
 
+// Actualizar una credencial (PUT /credentials/:id)
+const updateCredential = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+    const { service_name, account_username, password, url, notes } = req.body;
+
+    const checkQuery =
+      "SELECT id_credential FROM CREDENTIALS WHERE id_credential = $1 AND id_user = $2";
+    const checkResult = await db.query(checkQuery, [id, userId]);
+
+    if (checkResult.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Credencial no encontrada o no tienes acceso" });
+    }
+
+    let query;
+    let values;
+
+    if (password) {
+      const encryptedPassword = encrypt(password);
+      query = `
+                UPDATE CREDENTIALS 
+                SET service_name = $1, account_username = $2, password_encrypted = $3, url = $4, notes = $5, update_at_credential = CURRENT_TIMESTAMP
+                WHERE id_credential = $6 AND id_user = $7
+                RETURNING id_credential, service_name, update_at_credential
+            `;
+      values = [
+        service_name,
+        account_username,
+        encryptedPassword,
+        url,
+        notes,
+        id,
+        userId,
+      ];
+    } else {
+      query = `
+                UPDATE CREDENTIALS 
+                SET service_name = $1, account_username = $2, url = $3, notes = $4, update_at_credential = CURRENT_TIMESTAMP
+                WHERE id_credential = $5 AND id_user = $6
+                RETURNING id_credential, service_name, update_at_credential
+            `;
+      values = [service_name, account_username, url, notes, id, userId];
+    }
+
+    const result = await db.query(query, values);
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al actualizar la credencial" });
+  }
+};
+
 module.exports = {
   createCredential,
   getCredentials,
   getCredentialById,
   deleteCredential,
   revealPassword,
+  updateCredential,
 };
