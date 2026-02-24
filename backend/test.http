@@ -1,7 +1,7 @@
 ### Variables globales
 @baseUrl = http://localhost:3000
-@token = tu_token
-@credentialId = tu_uuid
+@token = el_token_de_la_sesion
+@credentialId = el_uuid_de_la_credencial
 
 ### Registrar un nuevo usuario
 POST {{baseUrl}}/auth/register
