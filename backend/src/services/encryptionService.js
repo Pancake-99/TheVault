@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const envs = require("../config/envs");
 
 const ALGORITHM = "aes-256-cbc";
-const ENCRYPTION_KEY = Buffer.from(envs.ENCRYPTION_KEY, "utf-8");
+const ENCRYPTION_KEY = Buffer.from(envs.ENCRYPTION_KEY, "hex");
 
 const encrypt = (text) => {
   // Generamos un Vector de Inicialización (IV) de 16 bytes aleatorios
