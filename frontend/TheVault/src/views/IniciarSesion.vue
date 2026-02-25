@@ -41,7 +41,7 @@
               @click="mostrarContrasena = !mostrarContrasena"
               :title="mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             >
-              {{ mostrarContrasena ? '👁' : '👁' }}
+              {{ mostrarContrasena ? 'Ocultar' : 'Mostrar' }}
             </button>
           </div>
           <span v-if="errores.contrasena" class="field-error">{{ errores.contrasena }}</span>
@@ -49,7 +49,7 @@
 
         <!-- Error general (servidor / credenciales) -->
         <div v-if="errorGeneral" class="error-banner">
-          <span class="error-icon">⚠</span>
+          <span class="error-icon">!</span>
           <span>{{ errorGeneral }}</span>
         </div>
 

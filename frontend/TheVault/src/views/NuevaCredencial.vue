@@ -1,11 +1,11 @@
 <template>
   <div class="nueva-cred-page">
     <div class="form-card">
-      <h2>➕ Nueva Credencial</h2>
+      <h2>Nueva Credencial</h2>
 
       <!-- Error del servidor -->
       <div v-if="errorGeneral" class="error-banner">
-        <span class="error-icon">⚠</span>
+        <span class="error-icon">!</span>
         <span>{{ errorGeneral }}</span>
       </div>
 
@@ -73,7 +73,7 @@
               @click="mostrarPassword = !mostrarPassword"
               :title="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             >
-              {{ mostrarPassword ? '🙈' : '👁' }}
+              {{ mostrarPassword ? 'Ocultar' : 'Mostrar' }}
             </button>
           </div>
           <span v-if="errores.password" class="field-error">{{ errores.password }}</span>
@@ -95,7 +95,7 @@
           <button type="button" class="btn-cancelar" @click="cancelar">Cancelar</button>
           <button type="submit" class="btn-guardar" :disabled="guardando">
             <span v-if="guardando" class="spinner"></span>
-            {{ guardando ? 'Guardando...' : '💾 Guardar' }}
+            {{ guardando ? 'Guardando...' : 'Guardar' }}
           </button>
         </div>
       </form>
@@ -172,11 +172,11 @@ async function guardar() {
 
   try {
     await crearCredencial({
-      servicio: form.servicio.trim(),
+      service_name: form.servicio.trim(),
       url: form.url.trim(),
-      usuario: form.usuario.trim(),
+      account_username: form.usuario.trim(),
       password: form.password,
-      notas: form.notas.trim(),
+      notes: form.notas.trim(),
     })
 
     router.push('/credenciales')

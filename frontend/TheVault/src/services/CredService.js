@@ -29,3 +29,9 @@ export async function eliminarCredencial(id) {
   const res = await api.delete(`/credentials/${id}`)
   return res.data
 }
+
+// Revelar contraseña → POST /credentials/:id/reveal
+export async function revelarCredencial(id) {
+  const res = await api.post(`/credentials/${id}/reveal`)
+  return res.data // { password }
+}

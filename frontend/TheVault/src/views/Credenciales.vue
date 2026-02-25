@@ -16,7 +16,7 @@
 
     <!-- Error al cargar -->
     <div v-else-if="errorCarga" class="error-banner">
-      <span class="error-icon">⚠</span>
+      <span class="error-icon">!</span>
       <span>{{ errorCarga }}</span>
       <button class="btn-reintentar" @click="cargarCredenciales">Reintentar</button>
     </div>
@@ -28,35 +28,35 @@
           <tr>
             <th>Servicio</th>
             <th>Usuario / Email</th>
-            <th>URL</th>
-            <th>Última actualización</th>
+            <th class="col-url">URL</th>
+            <th class="col-fecha">Última actualización</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="cred in credencialesFiltradas" :key="cred.id">
-            <td class="col-servicio">{{ cred.servicio }}</td>
-            <td>{{ cred.usuario }}</td>
-            <td>
+          <tr v-for="cred in credencialesFiltradas" :key="cred.id_credential">
+            <td class="col-servicio">{{ cred.service_name }}</td>
+            <td>{{ cred.account_username }}</td>
+            <td class="col-url">
               <a v-if="cred.url" :href="cred.url" target="_blank" rel="noopener" class="link-url">
                 {{ cred.url }}
               </a>
               <span v-else class="text-muted">—</span>
             </td>
-            <td>{{ formatearFecha(cred.ultimaActualizacion || cred.updatedAt) }}</td>
+            <td class="col-fecha">{{ formatearFecha(cred.update_at_credential || cred.created_at_credential) }}</td>
             <td class="col-acciones">
               <button class="btn-accion btn-ver" @click="verDetalle(cred)" title="Ver detalle">
-                👁 Ver
+                Ver
               </button>
               <button class="btn-accion btn-editar" @click="editarCredencial(cred)" title="Editar">
-                ✏️ Editar
+                Editar
               </button>
               <button
                 class="btn-accion btn-eliminar"
                 @click="confirmarEliminar(cred)"
                 title="Eliminar"
               >
-                🗑 Eliminar
+                Eliminar
               </button>
             </td>
           </tr>
@@ -74,24 +74,33 @@
     <div v-if="credencialSeleccionada" class="modal-overlay" @click.self="cerrarModal">
       <div class="modal">
         <div class="modal-header">
-          <h3>{{ credencialSeleccionada.servicio }}</h3>
-          <button class="btn-cerrar" @click="cerrarModal">✕</button>
+          <h3>{{ credencialSeleccionada.service_name }}</h3>
+          <button class="btn-cerrar" @click="cerrarModal">×</button>
         </div>
         <div class="modal-body">
           <div class="detalle-row">
             <span class="detalle-label">Servicio:</span>
-            <span>{{ credencialSeleccionada.servicio }}</span>
+            <span>{{ credencialSeleccionada.service_name }}</span>
           </div>
           <div class="detalle-row">
             <span class="detalle-label">Usuario / Email:</span>
-            <span>{{ credencialSeleccionada.usuario }}</span>
+            <span>{{ credencialSeleccionada.account_username }}</span>
           </div>
           <div class="detalle-row">
             <span class="detalle-label">Contraseña:</span>
             <span class="contrasena-field">
-              <code>{{ mostrandoPassword ? credencialSeleccionada.password : '••••••••••' }}</code>
-              <button class="btn-toggle-pass" @click="togglePassword">
-                {{ mostrandoPassword ? '🙈 Ocultar' : '👁 Mostrar' }}
+              <code>{{ mostrandoPassword ? passwordRevelado : '••••••••••' }}</code>
+              <button class="btn-toggle-pass" @click="togglePassword" :disabled="cargandoPassword">
+                <span v-if="cargandoPassword" class="spinner"></span>
+                {{ cargandoPassword ? '' : (mostrandoPassword ? 'Ocultar' : 'Mostrar') }}
+              </button>
+              <button
+                class="btn-toggle-pass btn-copiar"
+                @click="copiarPassword"
+                :disabled="cargandoPassword"
+                :title="copiado ? '¡Copiado!' : 'Copiar contraseña'"
+              >
+                {{ copiado ? '¡Copiado!' : 'Copiar' }}
               </button>
             </span>
           </div>
@@ -101,15 +110,15 @@
               {{ credencialSeleccionada.url }}
             </a>
           </div>
-          <div class="detalle-row" v-if="credencialSeleccionada.notas">
+          <div class="detalle-row" v-if="credencialSeleccionada.notes">
             <span class="detalle-label">Notas:</span>
-            <span class="detalle-notas">{{ credencialSeleccionada.notas }}</span>
+            <span class="detalle-notas">{{ credencialSeleccionada.notes }}</span>
           </div>
           <div class="detalle-row">
             <span class="detalle-label">Última actualización:</span>
             <span>{{
               formatearFecha(
-                credencialSeleccionada.ultimaActualizacion || credencialSeleccionada.updatedAt,
+                credencialSeleccionada.update_at_credential || credencialSeleccionada.created_at_credential,
               )
             }}</span>
           </div>
@@ -121,13 +130,13 @@
     <div v-if="modalEdicion" class="modal-overlay" @click.self="cerrarEdicion">
       <div class="modal modal-edicion">
         <div class="modal-header">
-          <h3>✏️ Editar Credencial</h3>
-          <button class="btn-cerrar" @click="cerrarEdicion">✕</button>
+          <h3>Editar Credencial</h3>
+          <button class="btn-cerrar" @click="cerrarEdicion">×</button>
         </div>
         <div class="modal-body">
           <!-- Error del servidor -->
           <div v-if="errorEdicion" class="error-banner error-inline">
-            <span class="error-icon">⚠</span>
+            <span class="error-icon">!</span>
             <span>{{ errorEdicion }}</span>
           </div>
 
@@ -199,7 +208,7 @@
                   @click="mostrarPasswordEdicion = !mostrarPasswordEdicion"
                   :title="mostrarPasswordEdicion ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                 >
-                  {{ mostrarPasswordEdicion ? '🙈' : '👁' }}
+                  {{ mostrarPasswordEdicion ? 'Ocultar' : 'Mostrar' }}
                 </button>
               </div>
               <span v-if="erroresEdicion.password" class="field-error">{{
@@ -223,7 +232,7 @@
               <button type="button" class="btn-cancelar" @click="cerrarEdicion">Cancelar</button>
               <button type="submit" class="btn-guardar" :disabled="guardandoEdicion">
                 <span v-if="guardandoEdicion" class="spinner"></span>
-                {{ guardandoEdicion ? 'Guardando...' : '💾 Guardar' }}
+                {{ guardandoEdicion ? 'Guardando...' : 'Guardar' }}
               </button>
             </div>
           </form>
@@ -239,6 +248,7 @@ import {
   obtenerCredenciales,
   actualizarCredencial,
   eliminarCredencial as eliminarCredencialApi,
+  revelarCredencial,
 } from '../services/CredService'
 
 // Lista de credenciales (cargada desde el backend)
@@ -249,6 +259,9 @@ const errorCarga = ref('')
 const busqueda = ref('')
 const credencialSeleccionada = ref(null)
 const mostrandoPassword = ref(false)
+const passwordRevelado = ref('')
+const cargandoPassword = ref(false)
+const copiado = ref(false)
 
 // ---- Modal de edición ----
 const modalEdicion = ref(false)
@@ -299,7 +312,7 @@ async function cargarCredenciales() {
 const credencialesFiltradas = computed(() => {
   if (!busqueda.value.trim()) return credenciales.value
   const termino = busqueda.value.toLowerCase()
-  return credenciales.value.filter((c) => c.servicio.toLowerCase().includes(termino))
+  return credenciales.value.filter((c) => (c.service_name || '').toLowerCase().includes(termino))
 })
 
 // Formatear fecha
@@ -316,26 +329,67 @@ function formatearFecha(fechaStr) {
 // ---- Acciones de detalle ----
 function verDetalle(cred) {
   mostrandoPassword.value = false
+  passwordRevelado.value = ''
   credencialSeleccionada.value = cred
 }
 
-function togglePassword() {
-  mostrandoPassword.value = !mostrandoPassword.value
+async function togglePassword() {
+  if (mostrandoPassword.value) {
+    // Ocultar
+    mostrandoPassword.value = false
+    return
+  }
+
+  // Revelar desde el backend
+  cargandoPassword.value = true
+  try {
+    const data = await revelarCredencial(credencialSeleccionada.value.id_credential)
+    passwordRevelado.value = data.password
+    mostrandoPassword.value = true
+  } catch (err) {
+    alert('Error al revelar la contraseña')
+  } finally {
+    cargandoPassword.value = false
+  }
+}
+
+async function copiarPassword() {
+  try {
+    let password = passwordRevelado.value
+
+    // Si no se ha obtenido aún, pedirla al backend sin mostrarla
+    if (!password) {
+      cargandoPassword.value = true
+      const data = await revelarCredencial(credencialSeleccionada.value.id_credential)
+      password = data.password
+      passwordRevelado.value = password
+      cargandoPassword.value = false
+    }
+
+    await navigator.clipboard.writeText(password)
+    copiado.value = true
+    setTimeout(() => { copiado.value = false }, 1500)
+  } catch (err) {
+    cargandoPassword.value = false
+    alert('Error al copiar la contraseña')
+  }
 }
 
 function cerrarModal() {
   credencialSeleccionada.value = null
   mostrandoPassword.value = false
+  passwordRevelado.value = ''
+  copiado.value = false
 }
 
 // ---- Acciones de edición ----
 function editarCredencial(cred) {
-  credencialEditandoId.value = cred.id
-  formEdicion.servicio = cred.servicio
+  credencialEditandoId.value = cred.id_credential
+  formEdicion.servicio = cred.service_name
   formEdicion.url = cred.url || ''
-  formEdicion.usuario = cred.usuario
-  formEdicion.password = cred.password
-  formEdicion.notas = cred.notas || ''
+  formEdicion.usuario = cred.account_username
+  formEdicion.password = ''
+  formEdicion.notas = cred.notes || ''
   mostrarPasswordEdicion.value = false
   errorEdicion.value = ''
 
@@ -387,21 +441,17 @@ async function guardarEdicion() {
 
   try {
     const datosActualizados = {
-      servicio: formEdicion.servicio.trim(),
+      service_name: formEdicion.servicio.trim(),
       url: formEdicion.url.trim(),
-      usuario: formEdicion.usuario.trim(),
-      password: formEdicion.password,
-      notas: formEdicion.notas.trim(),
+      account_username: formEdicion.usuario.trim(),
+      password: formEdicion.password || undefined,
+      notes: formEdicion.notas.trim(),
     }
 
     await actualizarCredencial(credencialEditandoId.value, datosActualizados)
 
-    // Actualizar la lista local con los datos editados
-    const idx = credenciales.value.findIndex((c) => c.id === credencialEditandoId.value)
-    if (idx !== -1) {
-      Object.assign(credenciales.value[idx], datosActualizados)
-      credenciales.value[idx].ultimaActualizacion = new Date().toISOString()
-    }
+    // Actualizar la lista local — recargar para tener datos frescos del servidor
+    await cargarCredenciales()
 
     cerrarEdicion()
   } catch (err) {
@@ -424,11 +474,11 @@ function cerrarEdicion() {
 
 // ---- Eliminar ----
 async function confirmarEliminar(cred) {
-  if (!confirm(`¿Eliminar la credencial de ${cred.servicio}?`)) return
+  if (!confirm(`¿Eliminar la credencial de ${cred.service_name}?`)) return
 
   try {
-    await eliminarCredencialApi(cred.id)
-    credenciales.value = credenciales.value.filter((c) => c.id !== cred.id)
+    await eliminarCredencialApi(cred.id_credential)
+    credenciales.value = credenciales.value.filter((c) => c.id_credential !== cred.id_credential)
   } catch (err) {
     alert('Error al eliminar la credencial')
   }
@@ -801,6 +851,15 @@ tbody td {
   background: rgba(59, 130, 246, 0.3);
 }
 
+.btn-copiar {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.btn-copiar:hover {
+  background: rgba(34, 197, 94, 0.3);
+}
+
 /* ---- Formulario de edición ---- */
 .form-group {
   margin-bottom: 16px;
@@ -974,6 +1033,70 @@ textarea:focus {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .credenciales-page {
+    padding: 16px 12px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  .btn-nueva {
+    text-align: center;
+  }
+
+  /* Ocultar columnas de URL y fecha en móvil */
+  .col-url,
+  .col-fecha {
+    display: none;
+  }
+
+  /* Botones de acción apilados */
+  .col-acciones {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .btn-accion {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Modal de detalle */
+  .modal {
+    max-width: 95vw;
+    margin: 0 8px;
+  }
+
+  .detalle-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .detalle-label {
+    min-width: unset;
+  }
+
+  .contrasena-field {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .contrasena-field code {
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>

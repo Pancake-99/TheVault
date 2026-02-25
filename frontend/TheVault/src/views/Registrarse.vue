@@ -42,7 +42,7 @@
               @click="mostrarPassword = !mostrarPassword"
               :title="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             >
-              {{ mostrarPassword ? '👁' : '👁' }}
+              {{ mostrarPassword ? 'Ocultar' : 'Mostrar' }}
             </button>
           </div>
           <span v-if="errores.password" class="field-error">{{ errores.password }}</span>
@@ -66,7 +66,7 @@
               @click="mostrarConfirmar = !mostrarConfirmar"
               :title="mostrarConfirmar ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             >
-              {{ mostrarConfirmar ? '👁' : '👁' }}
+              {{ mostrarConfirmar ? 'Ocultar' : 'Mostrar' }}
             </button>
           </div>
           <span v-if="errores.confirmarPassword" class="field-error">{{
@@ -76,7 +76,7 @@
 
         <!-- Error general -->
         <div v-if="errorGeneral" class="error-banner">
-          <span class="error-icon">⚠</span>
+          <span class="error-icon">!</span>
           <span>{{ errorGeneral }}</span>
         </div>
 
