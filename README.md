@@ -74,7 +74,47 @@ Garantiza consistencia, seguridad y estabilidad en el manejo de datos.
 -   Comunicación eficiente mediante API REST
     
 -   Alta integridad y confiabilidad de los datos
+  ## Diagrama de arquitectura:
+  
+  
+  <img width="974" height="732" alt="image" src="https://github.com/user-attachments/assets/89347ab5-488f-4c77-adc3-eb9a8dc79a83" />
 
 
+# USO DEL SITIO
 
-    
+**Pantalla inicial:** Inicio de sesión con campos de email y contraseña. En caso de no tener cuenta lleva enlace a la pantalla de creación de cuentas.
+
+
+<img width="1833" height="930" alt="image" src="https://github.com/user-attachments/assets/74e2aa95-a691-400b-a6ad-1bd6aaa352bd" />
+
+**Pantalla de creación de cuenta:** Campos para Email y contraseña, más campo de confirmación de contraseña y la creación de cuenta.
+
+<img width="1823" height="971" alt="image" src="https://github.com/user-attachments/assets/354e2380-2c50-4bf2-bd7e-a6e1183e447b" />
+
+**Pantalla de cuenta iniciada:** Permite la creación de credenciales y ver las existentes en la cuenta. Permite Ver, Editar y Eliminar las credenciales.
+
+<img width="1879" height="917" alt="image" src="https://github.com/user-attachments/assets/03e51bf5-a4d3-455d-89d8-677bec0a8969" />
+
+**Pantalla de ver credencial: ** Datos de la crdencial, se puede ver la contraseña si se desea.
+
+<img width="1811" height="917" alt="image" src="https://github.com/user-attachments/assets/8996b119-5821-4b19-9503-80d2204223a3" />
+
+**Pantalla de nueva credencial: ** Permite la creación de una credencial del servicio que se desea. Pide la url del servicio, la contraseña y notas.
+
+<img width="1866" height="952" alt="image" src="https://github.com/user-attachments/assets/f242e56a-d083-445c-a40e-9275dac7d31a" />
+
+
+# Pasos para ejecutar la aplicacion (local)
+## 1.- Levantamiento de la DB
+Una vez dentro de pgAdming4, crear la base de datos "TheVault", y ejecutar el script TheVault/backend/src/DB/TheVault_create.sql para crear las tablas necesarias
+
+## 2.- Levantamiento del Backend
+
+En el .env, reemplazar los credenciales de acceso a la DB por los correspondientes al usuario de pgAdmin4
+En la terminal, navegar hacia TheVault/backend/, y hacer uso de npm install para instalar las dependencias. Una vez finalizada la instalación, ejecutar npm run dev para finalizar el levantamiento del backend.
+
+## 3.- Levantamiento del frontend
+
+De manera similar, en la terminal, navegar hacia TheVault/frontend/TheVault, y hacer uso de npm install para instalar las dependencias. Una vez finalizada la instalación, ejecutar npm run dev para finalizar el levantamiento del frontend. Al usar vite, se recure al puerto 5173 para hacer uso de la aplicación.
+
+En caso de tener algun error con la instalación de las dependencias, instalar npm install axios manualmente.
